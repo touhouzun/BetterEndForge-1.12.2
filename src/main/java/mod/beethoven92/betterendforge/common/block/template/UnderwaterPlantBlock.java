@@ -52,6 +52,13 @@ public class UnderwaterPlantBlock extends BlockBush implements IGrowable, IShear
 	}
 
 	@Override
+	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
+		// BlockBush's vanilla soil check accepts grass/dirt and removes End
+		// aquatic plants as soon as a neighbouring decoration is updated.
+		return isTerrain(world.getBlockState(pos.down()));
+	}
+
+	@Override
 	public void onBlockPlacedBy(World worldIn, BlockPos currentPos, IBlockState stateIn, EntityLivingBase placer, ItemStack stack){
 		if (!this.canPlaceBlockAt(worldIn, currentPos)) {
 			worldIn.destroyBlock(currentPos, true);

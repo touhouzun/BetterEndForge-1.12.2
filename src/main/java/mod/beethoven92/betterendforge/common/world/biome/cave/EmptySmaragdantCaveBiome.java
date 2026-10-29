@@ -1,6 +1,5 @@
 package mod.beethoven92.betterendforge.common.world.biome.cave;
 
-import mod.beethoven92.betterendforge.client.audio.BetterEndMusicNames;
 import mod.beethoven92.betterendforge.common.init.ModFeatures;
 import mod.beethoven92.betterendforge.common.init.ModSoundEvents;
 import mod.beethoven92.betterendforge.common.world.biome.BetterEndCaveBiome;
@@ -17,7 +16,6 @@ public class EmptySmaragdantCaveBiome extends BetterEndCaveBiome
 				.setGrassColor(0, 131, 145)
 				.setWaterColor(31, 167, 212)
 				.setWaterFogColor(31, 167, 212)
-						.setMusic(BetterEndMusicNames.MUSIC_CAVES)
 						.setAmbientSound(ModSoundEvents.AMBIENT_CAVES));
 				//setParticles(ModParticleTypes.SMARAGDANT.get(), 0.001F));
 		

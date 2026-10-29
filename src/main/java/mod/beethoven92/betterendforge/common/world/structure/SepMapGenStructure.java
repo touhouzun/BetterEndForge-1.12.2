@@ -1,9 +1,11 @@
 package mod.beethoven92.betterendforge.common.world.structure;
 
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
-import net.minecraft.util.Rotation;
+import mod.beethoven92.betterendforge.common.world.biome.BetterEndBiome;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.Rotation;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.structure.MapGenStructure;
 
@@ -25,6 +27,14 @@ public abstract class SepMapGenStructure extends MapGenStructure {
 
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
     {
+        // Nether API keeps modded structures in one global list.  The 1.16
+        // implementation binds each structure to a biome, so perform that
+        // check here before applying the spacing rules.
+        if (world != null && !canSpawnInBiome(world.getBiome(new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8))))
+        {
+            return false;
+        }
+
         int i = chunkX;
         int j = chunkZ;
 
@@ -38,8 +48,11 @@ public abstract class SepMapGenStructure extends MapGenStructure {
 //            chunkZ -= 19;
 //        }
 
-        int k = chunkX / spacing;
-        int l = chunkZ / spacing;
+		// Java integer division truncates toward zero, which bunches starts on
+		// the negative side of the End around coordinate zero.  Floor division
+		// keeps the spacing grid uniform in all four directions.
+		int k = Math.floorDiv(chunkX, spacing);
+		int l = Math.floorDiv(chunkZ, spacing);
         Random random = this.world.setRandomSeed(k, l, salt);
         k = k * spacing;
         l = l * spacing;
@@ -48,13 +61,39 @@ public abstract class SepMapGenStructure extends MapGenStructure {
 
         if (i == k && j == l)// && this.endProvider.isIslandChunk(i, j))
         {
-            int i1 = getYPosForStructure(i, j, this.endProvider);
-            return i1 >= 50;
+            // The Nether API primer is not guaranteed to contain the final
+            // Better End terrain at this point (some generators return an
+            // empty primer until the chunk is requested).  Rejecting starts
+            // from that primer made every lake disappear.  The world height
+            // is already available during map generation and is the same
+            // value used by the piece itself.
+			int height = world.getHeight((i << 4) + 8, (j << 4) + 8);
+			if (height < 45)
+			{
+				height = getYPosForStructure(i, j, this.endProvider);
+			}
+			return height >= 45;
         }
         else
         {
             return false;
         }
+    }
+
+    /**
+     * Structures are global in Nether API; subclasses override this to keep
+     * them in the biome(s) where the 1.16 version places them.
+     */
+    protected boolean canSpawnInBiome(Biome biome)
+    {
+        return true;
+    }
+
+    protected static boolean isBiome(Biome biome, BetterEndBiome expected)
+    {
+        return biome == expected.getBiome()
+                || biome == expected.getActualBiome()
+                || expected.getID().equals(biome.getRegistryName());
     }
 
     public static int getYPosForStructure(int chunkX, int chunkY, INetherAPIChunkGenerator generatorIn)

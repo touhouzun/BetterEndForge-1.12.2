@@ -18,7 +18,6 @@
 //
 //	@Override
 //	protected void start() {
-//		add("better_end_music_disc", ModLootModifiers.BETTER_END_MUSIC_DISC,
 //				new BetterEndMusicDiscLootModifier(new ILootCondition[] { RandomChance.builder(0.1f).build(),
 //						new FromLootTable(LootTables.CHESTS_END_CITY_TREASURE) }, 0, 5));
 //	}

@@ -205,7 +205,7 @@ public class EndLotusSeedBlock extends BlockBush implements IGrowable, IPlantabl
 			for (int z = -1; z < 2; z++)
 			{
 				p.setPos(p.getX(), p.getY(), pos.getZ() + z);
-				if (world.isAirBlock(p) && !world.getBlockState(p.down()).getMaterial().isReplaceable())
+				if (world.isAirBlock(p) && world.getBlockState(p.down()).getMaterial() == Material.WATER)
 					count++;
 			}
 		}

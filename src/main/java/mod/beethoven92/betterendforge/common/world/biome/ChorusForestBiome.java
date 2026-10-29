@@ -1,6 +1,5 @@
 package mod.beethoven92.betterendforge.common.world.biome;
 
-import mod.beethoven92.betterendforge.client.audio.BetterEndMusicNames;
 import mod.beethoven92.betterendforge.common.entity.EndSlimeEntity;
 import mod.beethoven92.betterendforge.common.init.ModBlocks;
 import mod.beethoven92.betterendforge.common.init.ModConfiguredFeatures;
@@ -24,7 +23,6 @@ public class ChorusForestBiome extends BetterEndBiome
 				setSurface(ModBlocks.CHORUS_NYLIUM).
 				//setParticles(ParticleTypes.PORTAL, 0.01F).
 				setAmbientSound(ModSoundEvents.AMBIENT_CHORUS_FOREST).
-				setMusic(BetterEndMusicNames.MUSIC_DARK).
 				addFeature(Decoration.UNDERGROUND_ORES, ModConfiguredFeatures.VIOLECITE_LAYER).
 				addFeature(Decoration.LAKES, ModConfiguredFeatures.END_LAKE_RARE).
 				addFeature(Decoration.VEGETAL_DECORATION, ModConfiguredFeatures.PYTHADENDRON).

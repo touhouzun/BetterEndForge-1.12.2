@@ -1,6 +1,5 @@
 package mod.beethoven92.betterendforge.common.world.biome;
 
-import mod.beethoven92.betterendforge.client.audio.BetterEndMusicNames;
 import mod.beethoven92.betterendforge.common.init.ModConfiguredFeatures;
 import mod.beethoven92.betterendforge.common.init.ModConfiguredSurfaceBuilders;
 import mod.beethoven92.betterendforge.common.init.ModSoundEvents;
@@ -16,7 +15,6 @@ public class NeonOasisBiome extends BetterEndBiome {
 				.setSurface(ModConfiguredSurfaceBuilders.NEON_OASUS_SURFACE)
 				//.setParticles(ParticleTypes.WHITE_ASH, 0.01F)
 				.setAmbientSound(ModSoundEvents.AMBIENT_DUST_WASTELANDS)
-				.setMusic(BetterEndMusicNames.MUSIC_OPENSPACE)
 				.addFeature(Decoration.LAKES, ModConfiguredFeatures.DESERT_LAKE)
 				.addFeature(Decoration.VEGETAL_DECORATION, ModConfiguredFeatures.NEON_CACTUS)
 				.addFeature(Decoration.VEGETAL_DECORATION, ModConfiguredFeatures.UMBRELLA_MOSS)

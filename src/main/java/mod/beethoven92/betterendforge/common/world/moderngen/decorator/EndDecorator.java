@@ -29,16 +29,24 @@ public class EndDecorator extends BiomeDecorator {
             return;
         }
         decorating = true;
-        int len = Decoration.values().length;
-        for(int i = 0; i < len; ++i) {
-            for(ConfiguredFeature<?, ?> feature : list.get(i)){
-                try {
-                    feature.place(worldIn, random, pos);
-                }catch (Exception e){
-                    int err = 0;
+        try {
+            // Caves/other generators can open the island's sides after the primer.
+            // Close those shores before any floating vegetation is placed.
+            if (worldIn.provider.getDimension() == 1)
+                mod.beethoven92.betterendforge.common.world.generator.LakeShore.seal(worldIn, pos);
+            int len = Decoration.values().length;
+            for(int i = 0; i < len; ++i) {
+                for(ConfiguredFeature<?, ?> feature : list.get(i)){
+                    try {
+                        feature.place(worldIn, random, pos);
+                    }catch (Exception e){
+                        mod.beethoven92.betterendforge.BetterEnd.LOGGER.warn("Failed to generate {} at {}",
+                                feature.feature().getClass().getName(), pos, e);
+                    }
                 }
             }
+        } finally {
+            decorating = false;
         }
-        decorating = false;
     }
 }

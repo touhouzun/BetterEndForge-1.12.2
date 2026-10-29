@@ -1,6 +1,5 @@
 package mod.beethoven92.betterendforge.common.world.biome.cave;
 
-import mod.beethoven92.betterendforge.client.audio.BetterEndMusicNames;
 import mod.beethoven92.betterendforge.common.init.ModBlocks;
 import mod.beethoven92.betterendforge.common.init.ModSoundEvents;
 import mod.beethoven92.betterendforge.common.world.biome.BetterEndCaveBiome;
@@ -22,7 +21,6 @@ public class JadeCaveBiome extends BetterEndCaveBiome {
 		super(new BiomeTemplate("jade_cave")
 				.setFogColor(118, 150, 112)
 				.setFogDensity(2.0F)
-				.setMusic(BetterEndMusicNames.MUSIC_CAVES)
 				.setAmbientSound(ModSoundEvents.AMBIENT_CAVES)
 				.setWaterFogColor(95, 223, 255));
 

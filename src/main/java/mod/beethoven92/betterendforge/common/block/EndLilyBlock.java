@@ -49,7 +49,11 @@ public class EndLilyBlock extends UnderwaterPlantBlock
 
 	@Override
 	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-		IBlockState state = worldIn.getBlockState(pos);
+		return super.canPlaceBlockAt(worldIn, pos);
+	}
+
+	@Override
+	public boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state) {
 		if (state.getValue(SHAPE) == TripleShape.TOP)
 		{
 			return worldIn.getBlockState(pos.down()).getBlock() == this;
@@ -68,7 +72,7 @@ public class EndLilyBlock extends UnderwaterPlantBlock
 
 	@Override
 	public void onBlockPlacedBy(World worldIn, BlockPos currentPos, IBlockState stateIn, EntityLivingBase placer, ItemStack stack) {
-		if (!canPlaceBlockAt(worldIn, currentPos))
+		if (!canBlockStay(worldIn, currentPos, stateIn))
 		{
 			worldIn.setBlockState(currentPos, stateIn.getValue(SHAPE) == TripleShape.TOP ? Blocks.AIR.getDefaultState() : Blocks.WATER.getDefaultState());
 		}

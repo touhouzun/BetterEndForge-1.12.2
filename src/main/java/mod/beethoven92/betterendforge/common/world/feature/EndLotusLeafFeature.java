@@ -7,7 +7,6 @@ import mod.beethoven92.betterendforge.common.block.EndLotusLeafBlock;
 import mod.beethoven92.betterendforge.common.init.ModBlocks;
 import mod.beethoven92.betterendforge.common.util.BlockHelper;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -30,7 +29,7 @@ public class EndLotusLeafFeature extends ScatterFeature
 			for (int z = -1; z < 2; z ++) 
 			{
 				p.setZ(blockPos.getZ() + z);
-				if (world.isAirBlock(p) && world.getBlockState(p.down())==(Blocks.WATER))
+				if (world.isAirBlock(p) && WaterPlantHelper.isWater(world.getBlockState(p.down())))
 					count ++;
 			}
 		}
@@ -40,7 +39,7 @@ public class EndLotusLeafFeature extends ScatterFeature
 	@Override
 	public boolean canGenerate(World world, Random random, BlockPos center, BlockPos blockPos, float radius) 
 	{
-		return world.isAirBlock(blockPos) && world.getBlockState(blockPos.down())==(Blocks.WATER);
+		return world.isAirBlock(blockPos) && WaterPlantHelper.isWater(world.getBlockState(blockPos.down()));
 	}
 
 	@Override
@@ -84,6 +83,25 @@ public class EndLotusLeafFeature extends ScatterFeature
 	@Override
 	protected BlockPos getCenterGround(World world, BlockPos pos) 
 	{
-		return world.getHeight(pos);
+		BlockPos water = WaterPlantHelper.surface(world, pos.getX(), pos.getZ());
+		return water == null ? pos : water.up();
 	}
+
+	@Override
+	protected boolean canSpawn(World world, BlockPos pos)
+	{
+		return world.isAirBlock(pos) && WaterPlantHelper.isWater(world.getBlockState(pos.down()));
+	}
+
+	@Override
+	protected boolean getGroundPlant(World world, BlockPos.MutableBlockPos pos)
+	{
+		BlockPos water = WaterPlantHelper.surface(world, pos.getX(), pos.getZ());
+		if (water == null) return false;
+		pos.setY(water.getY() + 1);
+		return canSpawn(world, pos);
+	}
+
+	@Override
+	protected int getYOffset() { return 0; }
 }

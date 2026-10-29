@@ -10,7 +10,6 @@ public class ClientConfig
 
     public static final ForgeConfigSpec.BooleanValue SKY_ENABLED;
     public static final ForgeConfigSpec.BooleanValue FOG_DENSITY_ENABLED;
-    public static final ForgeConfigSpec.BooleanValue BIOME_MUSIC_BLEND_ENABLED;
 
     static
     {
@@ -21,9 +20,6 @@ public class ClientConfig
 
         BUILDER.comment("\nEnable/disable biome fog density, set this to false if you don't want thick fog in certain biomes.\nDefault value: true");
         FOG_DENSITY_ENABLED = BUILDER.define("fogDensityEnabled", true);
-
-        BUILDER.comment("\nEnable/disable background music blending between biomes.\nDefault value: true");
-        BIOME_MUSIC_BLEND_ENABLED = BUILDER.define("biomeMusicBlendEnabled", true);
 
         BUILDER.pop();
 
@@ -45,10 +41,5 @@ public class ClientConfig
         return FOG_DENSITY_ENABLED.get();
     }
 
-    public static boolean shouldBlendBiomeMusic()
-    {
-        return BIOME_MUSIC_BLEND_ENABLED.get();
-    }
-    
      */
 }

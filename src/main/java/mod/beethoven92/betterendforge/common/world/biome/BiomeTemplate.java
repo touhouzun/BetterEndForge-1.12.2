@@ -17,7 +17,6 @@ import mod.beethoven92.betterendforge.common.world.moderngen.surfacebuilders.Con
 import mod.beethoven92.betterendforge.common.world.moderngen.surfacebuilders.SurfaceBuilder;
 import mod.beethoven92.betterendforge.common.world.moderngen.surfacebuilders.SurfaceBuilderConfig;
 import net.minecraft.block.Block;
-import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
@@ -55,7 +54,6 @@ public class BiomeTemplate
 	private SoundEvent ambient;
 //	private MoodSoundAmbience mood;
 //	private SoundAdditionsAmbience additions;
-	private String music;
 
 //	private ParticleEffectAmbience particle;
 
@@ -186,12 +184,6 @@ public class BiomeTemplate
 //		this.additions = new SoundAdditionsAmbience(additions, 0.0111D);
 //		return this;
 //	}
-
-	public BiomeTemplate setMusic(String music)
-	{
-		this.music = music;
-		return this;
-	}
 
 	public BiomeTemplate setCaves(boolean hasCaves)
 	{
@@ -333,7 +325,6 @@ public class BiomeTemplate
 		biome.setGrassColor(grassColor);
 		biome.setSurface(surface);
 		biome.setFogColor(fogColor);
-		biome.setMusicType(music);
 		biome.setAmbientSound(ambient);
 
 		for (SpawnInfo info : mobs)
@@ -413,14 +404,6 @@ public class BiomeTemplate
 //		if (ambient != null) effects.setAmbientSound(ambient);
 //		if (mood != null) effects.setMoodSound(mood);
 //		if (additions != null) effects.setAdditionsSound(additions);
-//		if (music != null)
-//		{
-//			effects.setMusic(new BackgroundMusicSelector(music, 600, 2400, true));
-//		}
-//		else
-//		{
-//			effects.setMusic(BackgroundMusicTracks.END_MUSIC);
-//		}
 //
 //		// Set particles
 //		if (particle != null) effects.setParticle(particle);

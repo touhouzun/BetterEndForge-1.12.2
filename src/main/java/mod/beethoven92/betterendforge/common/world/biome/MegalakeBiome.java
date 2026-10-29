@@ -1,6 +1,5 @@
 package mod.beethoven92.betterendforge.common.world.biome;
 
-import mod.beethoven92.betterendforge.client.audio.BetterEndMusicNames;
 import mod.beethoven92.betterendforge.common.entity.CubozoaEntity;
 import mod.beethoven92.betterendforge.common.entity.DragonflyEntity;
 import mod.beethoven92.betterendforge.common.entity.EndFishEntity;
@@ -22,7 +21,6 @@ public class MegalakeBiome extends BetterEndBiome
 				setWaterColor(96, 163, 255).
 				setWaterFogColor(96, 163, 255).
 				setFogDensity(1.75F).
-				setMusic(BetterEndMusicNames.MUSIC_WATER).
 				setAmbientSound(ModSoundEvents.AMBIENT_MEGALAKE).
 				//setSurface(ModConfiguredSurfaceBuilders.get(ModConfiguredSurfaceBuilders.MEGALAKE_SURFACE)).
 				setSurface(ModConfiguredSurfaceBuilders.MEGALAKE_SURFACE).
@@ -36,7 +34,6 @@ public class MegalakeBiome extends BetterEndBiome
 				addFeature(Decoration.VEGETAL_DECORATION, ModConfiguredFeatures.CHARNIA_CYAN).
 				addFeature(Decoration.VEGETAL_DECORATION, ModConfiguredFeatures.CHARNIA_LIGHT_BLUE).
 				addFeature(Decoration.VEGETAL_DECORATION, ModConfiguredFeatures.CHARNIA_RED_RARE).
-				//addStructure(ModConfiguredStructures.MEGALAKE_STRUCTURE).
 				addMobSpawn(EnumCreatureType.MONSTER, EntityEnderman.class, 10, 1, 2).
 				addMobSpawn(EnumCreatureType.AMBIENT, DragonflyEntity.class, 50, 1, 3).
 				addMobSpawn(EnumCreatureType.AMBIENT, CubozoaEntity.class, 50, 3, 8).

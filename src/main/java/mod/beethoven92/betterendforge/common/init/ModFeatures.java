@@ -75,7 +75,7 @@ public class ModFeatures
 {
 	// WATER PLANTS
 	public static final WorldGenerator END_LOTUS = new EndLotusFeature(7);
-	public static final WorldGenerator END_LOTUS_LEAF = new EndLotusLeafFeature(20);	
+	public static final WorldGenerator END_LOTUS_LEAF = new EndLotusLeafFeature(6);
 	public static final WorldGenerator BUBBLE_CORAL = new UnderwaterPlantFeature(ModBlocks.BUBBLE_CORAL, 6);
 	public static final WorldGenerator BUBBLE_CORAL_RARE = new UnderwaterPlantFeature(ModBlocks.BUBBLE_CORAL, 3);
 	public static final WorldGenerator END_LILY = new EndLilyFeature(6);
@@ -176,6 +176,7 @@ public class ModFeatures
 	// TERRAIN
 	public static final WorldGenerator ROUND_CAVE = new RoundCaveFeature();
 	public static final WorldGenerator END_LAKE = new EndLakeFeature();
+	public static final WorldGenerator CRYSTAL_MOUNTAIN = new CrystalMountainFeature();
 	public static final WorldGenerator END_LAKE_RARE = new EndLakeFeature();
 	public static final WorldGenerator DESERT_LAKE = new DesertLakeFeature();
 	public static final WorldGenerator SPIRE = new SpireFeature();

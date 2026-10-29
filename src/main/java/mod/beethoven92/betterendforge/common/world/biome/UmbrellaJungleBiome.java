@@ -1,6 +1,5 @@
 package mod.beethoven92.betterendforge.common.world.biome;
 
-import mod.beethoven92.betterendforge.client.audio.BetterEndMusicNames;
 import mod.beethoven92.betterendforge.common.init.ModBlocks;
 import mod.beethoven92.betterendforge.common.init.ModConfiguredFeatures;
 import mod.beethoven92.betterendforge.common.init.ModSoundEvents;
@@ -20,7 +19,6 @@ public class UmbrellaJungleBiome extends BetterEndBiome
 				setFoliageColor(27, 183, 194).
 				setSurface(ModBlocks.JUNGLE_MOSS).
 				setAmbientSound(ModSoundEvents.AMBIENT_UMBRELLA_JUNGLE).
-				setMusic(BetterEndMusicNames.MUSIC_FOREST).
 				//setParticles(ModParticleTypes.JUNGLE_SPORE, 0.001F).
 				addFeature(Decoration.VEGETAL_DECORATION, ModConfiguredFeatures.UMBRELLA_TREE).
 				addFeature(Decoration.VEGETAL_DECORATION, ModConfiguredFeatures.JELLYSHROOM).

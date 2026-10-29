@@ -13,6 +13,7 @@ import mod.beethoven92.betterendforge.common.util.AdvMathHelper;
 import mod.beethoven92.betterendforge.common.util.ModMathHelper;
 import mod.beethoven92.betterendforge.common.world.feature.Mutable;
 import mod.beethoven92.betterendforge.common.world.generator.OpenSimplexNoise;
+import mod.beethoven92.betterendforge.common.world.biome.ExtendedBiome;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -52,7 +53,7 @@ public class MountainPiece extends StructureComponent
 		this.seed2 = rand.nextInt();
 		this.noise1 = new OpenSimplexNoise(this.seed1);
 		this.noise2 = new OpenSimplexNoise(this.seed2);
-		top = biome.topBlock;
+		top = getSurfaceTop(biome);
 		this.biomeID = ModBiomes.getBiomeID(biome);
 		makeBoundingBox();
 	}
@@ -68,7 +69,7 @@ public class MountainPiece extends StructureComponent
 		seed2 = nbt.getInteger("seed2");
 		noise1 = new OpenSimplexNoise(seed1);
 		noise2 = new OpenSimplexNoise(seed2);
-		top = ModBiomes.getBiome(biomeID).getBiome().topBlock;
+		top = getSurfaceTop(ModBiomes.getBiome(biomeID).getBiome());
 		makeBoundingBox();
 	}
 
@@ -100,7 +101,10 @@ public class MountainPiece extends StructureComponent
 		int sx = structureBoundingBoxIn.minX;
 		int sz = structureBoundingBoxIn.minZ;
 		Mutable pos = new Mutable();
-		Chunk chunk = world.getChunk(center.getX() >> 4, center.getZ() >> 4);
+		// A mountain spans many chunks.  Use the chunk currently being
+		// populated instead of repeatedly writing every piece into its center
+		// chunk.
+		Chunk chunk = world.getChunk(sx >> 4, sz >> 4);
 		for (int x = 0; x < 16; x++) 
 		{
 			int px = x + sx;
@@ -307,5 +311,18 @@ public class MountainPiece extends StructureComponent
 				}
 			}
 		}
+	}
+
+	private IBlockState getSurfaceTop(Biome biome)
+	{
+		if (biome instanceof ExtendedBiome)
+		{
+			ExtendedBiome extended = (ExtendedBiome) biome;
+			if (extended.getSurface() != null)
+			{
+				return extended.getSurface().config.getTop();
+			}
+		}
+		return biome.topBlock;
 	}
 }

@@ -15,7 +15,6 @@
 //@EventBusSubscriber(modid = BetterEnd.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 //public class ModLootModifiers
 //{
-//	public static final GlobalLootModifierSerializer<BetterEndMusicDiscLootModifier> BETTER_END_MUSIC_DISC = null;
 //
 //	@SubscribeEvent
 //	public static void onRegisterModifiers(RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
@@ -23,7 +22,6 @@
 //		IForgeRegistry<GlobalLootModifierSerializer<?>> reg = event.getRegistry();
 //
 //		BetterEndMusicDiscLootModifier.Serializer modifier = new BetterEndMusicDiscLootModifier.Serializer();
-//		modifier.setRegistryName(new ResourceLocation(BetterEnd.MOD_ID, "better_end_music_disc"));
 //		reg.register(modifier);
 //	}
 //}

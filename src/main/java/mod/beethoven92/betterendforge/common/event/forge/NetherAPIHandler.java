@@ -19,7 +19,10 @@ public class NetherAPIHandler {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     static void onNetherAPIRegistry(@Nonnull final NetherAPIRegistryEvent.End event)
     {
-        //ModStructures.registerStructures(event.registry);
+        // Nether API creates the End generator's structure list from this
+        // registry before a world is generated.  Register the structures here
+        // so the biome entries below can actually produce their structures.
+        ModStructures.registerStructures(event.registry);
         ModBiomes.getModBiomes().forEach((end_biome) -> {
             if(!ModBiomes.CAVE_BIOMES.getBiomes().contains(end_biome))
                 event.registry.registerBiome(end_biome.getBiome(), Configs.BIOME_CONFIG.getInt(end_biome.getID(), "netherapi_weight", 80));

@@ -1,325 +1,325 @@
 package mod.beethoven92.betterendforge.common.world.structure.piece;
 
-import java.util.Map;
 import java.util.Random;
-
-import com.google.common.collect.Maps;
 
 import mod.beethoven92.betterendforge.common.block.template.PlantBlock;
 import mod.beethoven92.betterendforge.common.init.ModBiomes;
-import mod.beethoven92.betterendforge.common.init.ModBlocks;
-import mod.beethoven92.betterendforge.common.init.ModStructurePieces;
 import mod.beethoven92.betterendforge.common.init.ModTags;
 import mod.beethoven92.betterendforge.common.util.BlockHelper;
-import mod.beethoven92.betterendforge.common.util.ModMathHelper;
-import mod.beethoven92.betterendforge.common.world.feature.Mutable;
+import mod.beethoven92.betterendforge.common.world.biome.ExtendedBiome;
 import mod.beethoven92.betterendforge.common.world.generator.OpenSimplexNoise;
+import mod.beethoven92.betterendforge.common.world.generator.LakeOreDictionary;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 
+/** A deterministic, closed two-dimensional lake basin. */
 public class LakePiece extends StructureComponent
 {
 	private static final IBlockState ENDSTONE = Blocks.END_STONE.getDefaultState();
 	private static final IBlockState AIR = Blocks.AIR.getDefaultState();
 	private static final IBlockState WATER = Blocks.WATER.getDefaultState();
-	
-	private Map<Integer, Byte> heightmap = Maps.newHashMap();
-	
-	private OpenSimplexNoise noise;
+
 	private BlockPos center;
 	private float radius;
-	private float aspect;
 	private float depth;
+	private int waterLevel;
 	private int seed;
-	
 	private ResourceLocation biomeID;
+	private transient OpenSimplexNoise noise;
+	private transient LakeOreDictionary ores = new LakeOreDictionary();
 
-	
-	public LakePiece(BlockPos center, float radius, float depth, Random random, Biome biome) 
+	public LakePiece(BlockPos center, float radius, float depth, Random random, Biome biome)
 	{
 		super(random.nextInt());
 		this.center = center;
 		this.radius = radius;
 		this.depth = depth;
+		this.waterLevel = center.getY() - 1;
 		this.seed = random.nextInt();
-		this.noise = new OpenSimplexNoise(this.seed);
-		this.aspect = radius / depth;
+		this.noise = new OpenSimplexNoise(seed);
 		this.biomeID = ModBiomes.getBiomeID(biome);
 		makeBoundingBox();
 	}
 
 	@Override
-	protected void readStructureFromNBT(NBTTagCompound nbt, TemplateManager p_i50677_1_) {
-		// READ STRUCTURE DATA
+	protected void readStructureFromNBT(NBTTagCompound nbt, TemplateManager manager)
+	{
 		this.center = new BlockPos(nbt.getInteger("centerX"), nbt.getInteger("centerY"), nbt.getInteger("centerZ"));
 		this.radius = nbt.getFloat("radius");
 		this.depth = nbt.getFloat("depth");
-		seed = nbt.getInteger("seed");
-		noise = new OpenSimplexNoise(seed);
-		aspect = radius / depth;
+		this.waterLevel = nbt.hasKey("waterLevel") ? nbt.getInteger("waterLevel") : center.getY() - 1;
+		this.seed = nbt.getInteger("seed");
+		this.noise = new OpenSimplexNoise(seed);
 		this.biomeID = new ResourceLocation(nbt.getString("biomeid"));
+		this.ores = new LakeOreDictionary();
 		makeBoundingBox();
 	}
 
 	@Override
-	protected void writeStructureToNBT(NBTTagCompound tagCompound) {
-		tagCompound.setInteger("centerX", this.center.getX());
-		tagCompound.setInteger("centerY", this.center.getY());
-		tagCompound.setInteger("centerZ", this.center.getZ());
-		tagCompound.setFloat("radius", this.radius);
-		tagCompound.setFloat("depth", this.depth);
-		tagCompound.setInteger("seed", seed);
-		tagCompound.setString("biomeid", this.biomeID.toString());
-	}
-	
-	private void makeBoundingBox() 
+	protected void writeStructureToNBT(NBTTagCompound tag)
 	{
-		int minX = ModMathHelper.floor(center.getX() - radius - 8);
-		int minY = ModMathHelper.floor(center.getY() - depth - 8);
-		int minZ = ModMathHelper.floor(center.getZ() - radius - 8);
-		int maxX = ModMathHelper.floor(center.getX() + radius + 8);
-		int maxY = ModMathHelper.floor(center.getY() + depth);
-		int maxZ = ModMathHelper.floor(center.getZ() + radius + 8);
-		this.boundingBox = new StructureBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+		tag.setInteger("centerX", center.getX());
+		tag.setInteger("centerY", center.getY());
+		tag.setInteger("centerZ", center.getZ());
+		tag.setFloat("radius", radius);
+		tag.setFloat("depth", depth);
+		tag.setInteger("waterLevel", waterLevel);
+		tag.setInteger("seed", seed);
+		tag.setString("biomeid", biomeID.toString());
+	}
+
+	private void makeBoundingBox()
+	{
+		int r = MathHelper.ceil(radius) + 2;
+		this.boundingBox = new StructureBoundingBox(center.getX() - r, waterLevel - MathHelper.ceil(depth) - 2,
+				center.getZ() - r, center.getX() + r, waterLevel + 3, center.getZ() + r);
 	}
 
 	@Override
-	public boolean addComponentParts(World world, Random random, StructureBoundingBox structureBoundingBoxIn)
+	public boolean addComponentParts(World world, Random random, StructureBoundingBox box)
 	{
-		int minY = this.boundingBox.minY;
-		int maxY = this.boundingBox.maxY;
-		int sx = center.getX() << 4;
-		int sz = center.getZ() << 4;
-		Mutable mut = new Mutable();
-		Chunk chunk = world.getChunk(center.getX(), center.getZ());
-		for (int x = 0; x < 16; x++) 
+		ores = new LakeOreDictionary();
+		int minX = Math.max(box.minX, boundingBox.minX);
+		int maxX = Math.min(box.maxX, boundingBox.maxX);
+		int minZ = Math.max(box.minZ, boundingBox.minZ);
+		int maxZ = Math.min(box.maxZ, boundingBox.maxZ);
+		if (minX > maxX || minZ > maxZ) return false;
+
+		for (int x = minX; x <= maxX; x++)
 		{
-			mut.setX(x);
-			int wx = x | sx;
-			double nx = wx * 0.1;
-			int x2 = wx - center.getX();
-			for (int z = 0; z < 16; z++) 
+			for (int z = minZ; z <= maxZ; z++)
 			{
-				mut.setZ(z);
-				int wz = z | sz;
-				double nz = wz * 0.1;
-				int z2 = wz - center.getZ();
-				float clamp = getHeightClamp(world, 8, wx, wz);
-				if (clamp < 0.01) continue;
-				
-				double n = noise.eval(nx, nz) * 1.5 + 1.5;
-				double x3 = ModMathHelper.pow2(x2 + noise.eval(nx, nz, 100) * 10);
-				double z3 = ModMathHelper.pow2(z2 + noise.eval(nx, nz, -100) * 10);
-				
-				for (int y = minY; y <= maxY; y++) 
+				if (!inside(x, z)) continue;
+				int surface = getSurfaceHeight(world, x, z);
+				if (!validColumn(world, x, z, surface)) continue;
+				int bottom = getBottom(x, z);
+				if (!canCarveColumn(world, x, z, bottom, surface)) continue;
+
+				for (int y = bottom; y <= surface + 2; y++)
 				{
-					mut.setY((int) (y + n));
-					double y2 = ModMathHelper.pow2((y - center.getY()) * aspect);
-					double r2 = radius * clamp;
-					double r3 = r2 + 8;
-					r2 *= r2;
-					r3 = r3 * r3 + 100;
-					double dist = x3 + y2 + z3;
-					if (dist < r2) 
+					BlockPos pos = new BlockPos(x, y, z);
+					IBlockState state = world.getBlockState(pos);
+					if (!canReplace(state)) continue;
+					if (y == bottom) BlockHelper.setWithoutUpdate(world, pos, getSurfaceTop(world.getBiome(pos)));
+					else if (y <= waterLevel) BlockHelper.setWithoutUpdate(world, pos, WATER);
+					else if (y <= surface + 1) BlockHelper.setWithoutUpdate(world, pos, AIR);
+				}
+				removePlants(world, x, z, surface + 2);
+			}
+		}
+
+		// Raise a deterministic end-stone lip wherever the lake meets a low edge.
+		for (int x = minX; x <= maxX; x++)
+		{
+			for (int z = minZ; z <= maxZ; z++)
+			{
+				if (!inside(x, z) || !hasWater(world, x, z)) continue;
+				for (int dx = -1; dx <= 1; dx++)
+				{
+					for (int dz = -1; dz <= 1; dz++)
 					{
-						IBlockState state = chunk.getBlockState(mut);
-						if (canReplace(chunk, mut, state)) 
-						{
-							state = mut.getY() < center.getY() ? WATER : AIR;
-							chunk.setBlockState(mut, state);
-							removePlant(chunk, mut.toImmutable().up());
-						}
-					}
-					else if (dist <= r3 && mut.getY() < center.getY()) 
-					{
-						IBlockState state = chunk.getBlockState(mut);
-						BlockPos worldPos = mut.add(sx, 0, sz);
-						if (!state.isNormalCube() && !state.isOpaqueCube())
-						{
-							state = chunk.getBlockState(mut.up());
-							if (state.getBlock()==Blocks.AIR)
-							{
-								state = random.nextBoolean() ? ENDSTONE : world.getBiome(worldPos).topBlock;
-							}
-							else 
-							{
-								state = state.getBlock()!= Blocks.WATER ? ENDSTONE : ModBlocks.ENDSTONE_DUST.getDefaultState();
-							}
-							chunk.setBlockState(mut, state);
-						}
+						if (Math.abs(dx) + Math.abs(dz) != 1 || inside(x + dx, z + dz)) continue;
+						sealColumn(world, x + dx, z + dz);
 					}
 				}
 			}
 		}
-		
-		fixWater(world, chunk, mut, random, sx, sz);
+
+		// A lake can be generated on an island edge where the neighbouring
+		// columns are completely empty.  In that case the normal one-block lip
+		// has nothing to attach to and water can escape into the void.  Build a
+		// closed, deterministic shell around every exposed shore before the
+		// decorator gets a chance to place water plants.
+		reinforceVoidShore(world, minX, maxX, minZ, maxZ);
 		return true;
 	}
-	
-	private boolean canReplace(Chunk chunk, BlockPos pos, IBlockState state) {
-		if (ModTags.GEN_TERRAIN.contains(state.getBlock()) || state.getBlock()==Blocks.AIR)
-			return true;
-		Block b = state.getBlock();
-		if (b instanceof PlantBlock) {
-			removePlant(chunk, pos);
-			return true;
+
+	private boolean inside(int x, int z)
+	{
+		double dx = (x - center.getX()) / radius;
+		double dz = (z - center.getZ()) / radius;
+		double n = noise.eval(x * 0.035D, z * 0.035D) * 0.055D;
+		return dx * dx + dz * dz <= (1.0D + n) * (1.0D + n);
+	}
+
+	private int getBottom(int x, int z)
+	{
+		double dx = (x - center.getX()) / radius;
+		double dz = (z - center.getZ()) / radius;
+		double distance = Math.sqrt(Math.min(1.0D, dx * dx + dz * dz));
+		int d = Math.max(1, MathHelper.floor(depth * (1.0D - distance * 0.78D)));
+		return waterLevel - d;
+	}
+
+	private boolean validColumn(World world, int x, int z, int surface)
+	{
+		if (surface < waterLevel - 1 || surface > waterLevel + 4) return false;
+		// A lake is allowed to cross the parent biome's sub-biome boundary.  The
+		// old check against biomeID rejected almost every outer column because a
+		// MEGALAKE island commonly contains MEGALAKE_GROVE patches.
+		return true;
+	}
+
+	private boolean canCarveColumn(World world, int x, int z, int bottom, int surface)
+	{
+		for (int y = bottom; y <= surface + 1; y++)
+		{
+			if (!canReplace(world.getBlockState(new BlockPos(x, y, z)))) return false;
+		}
+		return true;
+	}
+
+	private boolean hasWater(World world, int x, int z)
+	{
+		return inside(x, z) && world.getBlockState(new BlockPos(x, waterLevel, z)).getBlock() == Blocks.WATER;
+	}
+
+	private void sealColumn(World world, int x, int z)
+	{
+		int surface = getSurfaceHeight(world, x, z);
+		if (surface >= waterLevel - 1) return;
+		IBlockState wall = getEnvironmentBlock(world, x, z);
+		// The lip reaches one block above the water surface.  Filling only to
+		// waterLevel - 1 still lets a source block flow sideways at the surface.
+		for (int y = Math.max(1, surface + 1); y <= waterLevel; y++)
+		{
+			BlockPos pos = new BlockPos(x, y, z);
+			if (canReplace(world.getBlockState(pos))) BlockHelper.setWithoutUpdate(world, pos, wall);
+		}
+	}
+
+	private void reinforceVoidShore(World world, int minX, int maxX, int minZ, int maxZ)
+	{
+		int shellRadius = MathHelper.ceil(radius) + 1;
+		int shellBottom = Math.max(1, waterLevel - MathHelper.ceil(depth) - 2);
+		int shellTop = Math.min(254, waterLevel + 1);
+		for (int x = Math.max(minX, center.getX() - shellRadius); x <= Math.min(maxX, center.getX() + shellRadius); x++)
+		{
+			for (int z = Math.max(minZ, center.getZ() - shellRadius); z <= Math.min(maxZ, center.getZ() + shellRadius); z++)
+			{
+				if (inside(x, z) || !nearWater(world, x, z)) continue;
+				if (!isVoidColumn(world, x, z, shellBottom, waterLevel))
+				{
+					// Existing low terrain still needs to be raised, but does not
+					// need the full void shell.
+					sealColumn(world, x, z);
+					continue;
+				}
+
+				IBlockState wall = getEnvironmentBlock(world, x, z);
+				for (int y = shellBottom; y <= shellTop; y++)
+				{
+					BlockPos blockPos = new BlockPos(x, y, z);
+					if (canReplace(world.getBlockState(blockPos)))
+					{
+						BlockHelper.setWithoutUpdate(world, blockPos, wall);
+					}
+				}
+			}
+		}
+	}
+
+	private boolean nearWater(World world, int x, int z)
+	{
+		for (int dx = -1; dx <= 1; dx++)
+		{
+			for (int dz = -1; dz <= 1; dz++)
+			{
+				if (dx == 0 && dz == 0) continue;
+				if (hasWater(world, x + dx, z + dz)) return true;
+			}
 		}
 		return false;
 	}
-	
-	private void removePlant(Chunk chunk, BlockPos pos) {
-		BlockPos p = new BlockPos(pos);
-		while (chunk.getBlockState(p).getBlock() instanceof PlantBlock) {
-			chunk.setBlockState(p, AIR);
-			p = p.up();
+
+	private boolean isVoidColumn(World world, int x, int z, int minY, int maxY)
+	{
+		boolean foundSolid = false;
+		for (int y = minY; y <= maxY; y++)
+		{
+			IBlockState state = world.getBlockState(new BlockPos(x, y, z));
+			Block block = state.getBlock();
+			if (block != Blocks.AIR && block != Blocks.WATER && block != Blocks.FLOWING_WATER
+					&& !state.getMaterial().isReplaceable())
+			{
+				foundSolid = true;
+				break;
+			}
 		}
-		p = new BlockPos(pos).down();
-		while (chunk.getBlockState(p).getBlock() instanceof PlantBlock) {
-			chunk.setBlockState(p, AIR);
-			p = p.down();
+		return !foundSolid;
+	}
+
+	private IBlockState getEnvironmentBlock(World world, int x, int z)
+	{
+		// Prefer a nearby terrain block so sub-biomes (for example the grove)
+		// keep their own shore material even when the edge column is void.
+		for (int dx = -2; dx <= 2; dx++)
+		{
+			for (int dz = -2; dz <= 2; dz++)
+			{
+				int sx = x + dx;
+				int sz = z + dz;
+				int sy = getSurfaceHeight(world, sx, sz);
+				if (sy <= 1) continue;
+				IBlockState state = world.getBlockState(new BlockPos(sx, sy, sz));
+				if (state.getBlock() != Blocks.AIR && state.getBlock() != Blocks.WATER
+						&& state.getBlock() != Blocks.FLOWING_WATER && ModTags.GEN_TERRAIN.contains(state.getBlock()))
+				{
+					return state;
+				}
+			}
+		}
+		IBlockState biomeTop = getSurfaceTop(world.getBiome(new BlockPos(center.getX(), waterLevel, center.getZ())));
+		if (biomeTop.getBlock() != Blocks.AIR && biomeTop.getBlock() != Blocks.WATER
+				&& biomeTop.getBlock() != Blocks.FLOWING_WATER)
+		{
+			return biomeTop;
+		}
+		return ENDSTONE;
+	}
+
+	private int getSurfaceHeight(World world, int x, int z)
+	{
+		int y = MathHelper.clamp(world.getHeight(x, z), 1, 255);
+		if (world.isAirBlock(new BlockPos(x, y, z))) y--;
+		while (y > 1 && (world.isAirBlock(new BlockPos(x, y, z)) || world.getBlockState(new BlockPos(x, y, z)).getBlock() instanceof PlantBlock)) y--;
+		return y;
+	}
+
+	private void removePlants(World world, int x, int z, int top)
+	{
+		for (int y = Math.max(1, waterLevel + 1); y <= top; y++)
+		{
+			BlockPos pos = new BlockPos(x, y, z);
+			if (world.getBlockState(pos).getBlock() instanceof PlantBlock) BlockHelper.setWithoutUpdate(world, pos, AIR);
 		}
 	}
 
-	private void fixWater(World world, Chunk chunk, Mutable mut, Random random, int sx, int sz)
+	private boolean canReplace(IBlockState state)
 	{
-		int minY = this.boundingBox.minY;
-		int maxY = this.boundingBox.maxY;
-		for (int x = 0; x < 16; x++) 
-		{
-			mut.setX(x);
-			for (int z = 0; z < 16; z++) 
-			{
-				mut.setZ(z);
-				for (int y = minY; y <= maxY; y++) 
-				{
-					mut.setY(y);
-					IBlockState state = chunk.getBlockState(mut);
-					if (state.getBlock()==Blocks.WATER)
-					{
-						mut.setY(y - 1);
-						if (chunk.getBlockState(mut).getBlock()==Blocks.AIR)
-						{
-							mut.setY(y + 1);
-							
-							IBlockState bState = chunk.getBlockState(mut);
-							if (bState.getBlock()==Blocks.AIR)
-							{
-								bState = random.nextBoolean() ? ENDSTONE : world.getBiome(mut.add(sx, 0, sz)).topBlock;
-							}
-							else 
-							{
-								bState = bState.getBlock()!=Blocks.WATER ? ENDSTONE : ModBlocks.ENDSTONE_DUST.getDefaultState();
-							}
-							
-							mut.setY(y);
-							
-							makeEndstonePillar(chunk, mut, bState);
-						}
-						else if (x > 1 && x < 15 && z > 1 && z < 15) 
-						{
-							mut.setY(y);
-							for (EnumFacing dir: BlockHelper.HORIZONTAL_DIRECTIONS)
-							{
-								BlockPos wPos = mut.add(dir.getXOffset(), 0, dir.getZOffset());
-								if (chunk.getBlockState(wPos).getBlock()==Blocks.AIR)
-								{
-									mut.setY(y + 1);
-									IBlockState bState = chunk.getBlockState(mut);
-									if (bState.getBlock()==Blocks.AIR)
-									{
-										bState = random.nextBoolean() ? ENDSTONE : world.getBiome(mut.add(sx, 0, sz)).topBlock;
-									}
-									else {
-										bState = bState.getBlock()!=Blocks.WATER ? ENDSTONE : ModBlocks.ENDSTONE_DUST.getDefaultState();
-									}
-									mut.setY(y);
-									makeEndstonePillar(chunk, mut, bState);
-									break;
-								}
-							}
-						}
-						else if (chunk.getBlockState(mut.move(EnumFacing.UP)).getBlock()==Blocks.AIR)
-						{
-							world.updateBlockTick(mut.move(EnumFacing.DOWN), state.getBlock(), 0, 0);
-						}
-					}
-				}
-			}
-		}
+		Block block = state.getBlock();
+		return block == Blocks.AIR || block == Blocks.WATER || block == Blocks.FLOWING_WATER
+				|| ModTags.GEN_TERRAIN.contains(block) || block instanceof PlantBlock || ores.isOre(state)
+				|| state.getMaterial().isReplaceable();
 	}
-	
-	private void makeEndstonePillar(Chunk chunk, Mutable mut, IBlockState terrain)
+
+	private IBlockState getSurfaceTop(Biome biome)
 	{
-		chunk.setBlockState(mut, terrain);
-		mut.setY(mut.getY() - 1);
-		while (chunk.getBlockState(mut).getBlock()==Blocks.WATER)
+		if (biome instanceof ExtendedBiome)
 		{
-			chunk.setBlockState(mut, ENDSTONE);
-			mut.setY(mut.getY() - 1);
+			ExtendedBiome extended = (ExtendedBiome) biome;
+			if (extended.getSurface() != null) return extended.getSurface().config.getTop();
 		}
-	}
-	
-	private float getHeightClamp(World world, int radius, int posX, int posZ)
-	{
-		Mutable mut = new Mutable();
-		int r2 = radius * radius;
-		float height = 0;
-		float max = 0;
-		for (int x = -radius; x <= radius; x++) 
-		{
-			mut.setX(posX + x);
-			int x2 = x * x;
-			for (int z = -radius; z <= radius; z++)
-			{
-				mut.setZ(posZ + z);
-				int z2 = z * z;
-				if (x2 + z2 < r2) 
-				{
-					float mult = 1 - (float) Math.sqrt(x2 + z2) / radius;
-					max += mult;
-					height += getHeight(world, mut) * mult;
-				}
-			}
-		}
-		height /= max;
-		return MathHelper.clamp(height, 0, 1);
-	}
-	
-	private int getHeight(World world, BlockPos pos)
-	{
-		int p = ((pos.getX() & 2047) << 11) | (pos.getZ() & 2047);
-		int h = heightmap.getOrDefault(p, Byte.MIN_VALUE);
-		if (h > Byte.MIN_VALUE) 
-		{
-			return h;
-		}
-		
-		if (!ModBiomes.getBiomeID(world.getBiome(pos)).equals(biomeID)) 
-		{
-			heightmap.put(p, (byte) 0);
-			return 0;
-		}
-		
-		h = world.getHeight(pos.getX(), pos.getZ());
-		h = MathHelper.abs(h - center.getY());
-		h = h < 8 ? 1 : 0;
-		
-		heightmap.put(p, (byte) h);
-		return h;
+		return biome.topBlock;
 	}
 }
-
-

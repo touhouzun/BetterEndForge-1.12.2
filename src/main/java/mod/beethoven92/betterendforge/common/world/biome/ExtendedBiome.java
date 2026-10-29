@@ -1,7 +1,6 @@
 package mod.beethoven92.betterendforge.common.world.biome;
 
 import git.jbredwards.nether_api.api.audio.IMusicType;
-import git.jbredwards.nether_api.api.audio.impl.VanillaMusicType;
 import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
 import git.jbredwards.nether_api.api.biome.IEndBiome;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
@@ -13,7 +12,6 @@ import mod.beethoven92.betterendforge.common.world.moderngen.surfacebuilders.Con
 import mod.beethoven92.betterendforge.config.Configs;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.ParticleFlame;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -40,8 +38,6 @@ public class ExtendedBiome extends BiomeEnd implements IEndBiome, IAmbienceBiome
     private int fogColor;
 
     private ConfiguredSurfaceBuilder<?> surface;
-
-    private String musicType;
 
     private SoundEvent ambientSound;
 
@@ -79,10 +75,6 @@ public class ExtendedBiome extends BiomeEnd implements IEndBiome, IAmbienceBiome
 
     public void setSurface(ConfiguredSurfaceBuilder<?> surface) {
         this.surface = surface;
-    }
-
-    public void setMusicType(String musicType) {
-        this.musicType = musicType;
     }
 
     public void setAmbientSound(SoundEvent ambientSound) {
@@ -137,9 +129,7 @@ public class ExtendedBiome extends BiomeEnd implements IEndBiome, IAmbienceBiome
     @Override
     @SideOnly(Side.CLIENT)
     public IMusicType getMusicType() {
-        if(musicType==null || musicType.isEmpty())
-            return IEndBiome.super.getMusicType();
-        return new VanillaMusicType(MusicTicker.MusicType.valueOf(musicType));
+        return IEndBiome.super.getMusicType();
     }
 
     @Nullable

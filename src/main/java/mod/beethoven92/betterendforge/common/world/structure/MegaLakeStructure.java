@@ -2,12 +2,13 @@ package mod.beethoven92.betterendforge.common.world.structure;
 
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import mod.beethoven92.betterendforge.BetterEnd;
+import mod.beethoven92.betterendforge.common.init.ModBiomes;
 import mod.beethoven92.betterendforge.common.util.ModMathHelper;
 import mod.beethoven92.betterendforge.common.world.moderngen.decorator.Decoration;
 import mod.beethoven92.betterendforge.common.world.structure.piece.LakePiece;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.StructureStart;
 
 import java.util.Random;
@@ -31,19 +32,25 @@ public class MegaLakeStructure extends SepMapGenStructure
 		return BetterEnd.MOD_ID + ":megalake_structure";
 	}
 
+	@Override
+	protected boolean canSpawnInBiome(Biome biome)
+	{
+		return isBiome(biome, ModBiomes.MEGALAKE);
+	}
+
 	protected StructureStart getStructureStart(int chunkX, int chunkZ)
 	{
 		return new SDFStructureStart(this, this.world, this.rand, chunkX, chunkZ);
 	}
 
-	public class SDFStructureStart extends StructureStart
+	public static class SDFStructureStart extends StructureStart
 	{
-		MapGenStructure structure;
+		MegaLakeStructure structure;
 		public SDFStructureStart()
 		{
 		}
 
-		public SDFStructureStart(MapGenStructure structure, World worldIn, Random random, int chunkX, int chunkZ)
+		public SDFStructureStart(MegaLakeStructure structure, World worldIn, Random random, int chunkX, int chunkZ)
 		{
 			super(chunkX, chunkZ);
 			this.structure = structure;
@@ -52,19 +59,35 @@ public class MegaLakeStructure extends SepMapGenStructure
 
 		private void create(World worldIn, Random rand, int chunkX, int chunkZ)
 		{
-			int x = chunkX | ModMathHelper.randRange(4, 12, rand);
-			int z = chunkZ | ModMathHelper.randRange(4, 12, rand);
-			int y = getYPosForStructure(chunkX, chunkZ, endProvider);
-			if (y > 5) 
+			int x = (chunkX << 4) | ModMathHelper.randRange(4, 12, rand);
+			int z = (chunkZ << 4) | ModMathHelper.randRange(4, 12, rand);
+			int y = worldIn.getHeight(x, z);
+			if (y < 45) y = SepMapGenStructure.getYPosForStructure(chunkX, chunkZ, structure.endProvider);
+			float radius = ModMathHelper.randRange(48, 72, rand);
+			float depth = ModMathHelper.randRange(6, 10, rand);
+			if (isValidLocation(worldIn, x, z, y, radius))
 			{
-				//float radius = ModMathHelper.randRange(50, 100, rand);
-				//float depth = ModMathHelper.randRange(10, 16, rand);
-				float radius = ModMathHelper.randRange(50, 150, rand);
-				float depth = ModMathHelper.randRange(6, 10, rand);
 				LakePiece piece = new LakePiece(new BlockPos(x, y, z), radius, depth, rand, worldIn.getBiome(new BlockPos(x,y,z)));
 				this.components.add(piece);
 			}
 			this.updateBoundingBox();
+		}
+
+		private boolean isValidLocation(World world, int x, int z, int y, float radius)
+		{
+			if (y < 45 || y > 100) return false;
+			Biome centerBiome = world.getBiome(new BlockPos(x, y, z));
+			if (!((MegaLakeStructure) structure).canSpawnInBiome(centerBiome)) return false;
+			int waterLevel = y - 1;
+			for (int i = 0; i < 12; i++)
+			{
+				double angle = Math.PI * 2.0D * i / 12.0D;
+				int px = x + (int) Math.round(Math.cos(angle) * (radius + 3));
+				int pz = z + (int) Math.round(Math.sin(angle) * (radius + 3));
+				int height = world.getHeight(px, pz);
+				if (height < waterLevel - 2 || height > waterLevel + 7 || Math.abs(height - y) > 8) return false;
+			}
+			return true;
 		}
 
 	}

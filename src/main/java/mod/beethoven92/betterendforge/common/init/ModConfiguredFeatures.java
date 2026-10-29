@@ -10,6 +10,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 public class ModConfiguredFeatures 
 {
+	public static final ConfiguredFeature<?, ?> CRYSTAL_MOUNTAIN =
+			new ConfiguredFeature<>(ModFeatures.CRYSTAL_MOUNTAIN, IFeatureConfig.NO_FEATURE_CONFIG);
+
 	// WATER PLANTS
 	public static final ConfiguredFeature<?, ?> END_LOTUS = 
 			new ConfiguredFeature<>(ModFeatures.END_LOTUS,IFeatureConfig.NO_FEATURE_CONFIG).
@@ -17,7 +20,7 @@ public class ModConfiguredFeatures
 	
 	public static final ConfiguredFeature<?, ?> END_LOTUS_LEAF = 
 			new ConfiguredFeature<>(ModFeatures.END_LOTUS_LEAF,IFeatureConfig.NO_FEATURE_CONFIG).
-			decorated(Placement.SQUARE.configure(NoPlacementConfig.NO_PLACEMENT_CONFIG).count(25));
+			decorated(Placement.SQUARE.configure(NoPlacementConfig.NO_PLACEMENT_CONFIG).count(3));
 	
 	public static final ConfiguredFeature<?, ?> BUBBLE_CORAL = 
 			new ConfiguredFeature<>(ModFeatures.BUBBLE_CORAL,IFeatureConfig.NO_FEATURE_CONFIG).

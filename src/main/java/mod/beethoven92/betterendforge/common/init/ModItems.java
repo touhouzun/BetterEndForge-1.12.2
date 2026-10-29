@@ -115,15 +115,6 @@ public class ModItems
 	//public final static Item AETERNIUM_ANVIL = registerItem("aeternium_anvil", () -> new EndAnvilItem(ModBlocks.AETERNIUM_ANVIL).setCreativeTab(ModCreativeTabs.CREATIVE_TAB));
 
 	
-	// MUSIC DISCS
-	public final static Item MUSIC_DISC_STRANGE_AND_ALIEN = registerItem("music_disc_strange_and_alien", () -> new ItemRecord("strange_and_alien", ModSoundEvents.RECORD_STRANGE_AND_ALIEN){}.setCreativeTab(ModCreativeTabs.CREATIVE_TAB).setMaxStackSize(1));
-	public final static Item MUSIC_DISC_GRASPING_AT_STARS = registerItem("music_disc_grasping_at_stars", () -> new ItemRecord("grasping_at_stars", ModSoundEvents.RECORD_GRASPING_AT_STARS){}.setCreativeTab(ModCreativeTabs.CREATIVE_TAB).setMaxStackSize(1));
-	public final static Item MUSIC_DISC_ENDSEEKER = registerItem("music_disc_endseeker", () -> new ItemRecord("endseeker", ModSoundEvents.RECORD_ENDSEEKER){}.setCreativeTab(ModCreativeTabs.CREATIVE_TAB).setMaxStackSize(1));
-	public final static Item MUSIC_DISC_EO_DRACONA = registerItem("music_disc_eo_dracona", () -> new ItemRecord("eo_dracona", ModSoundEvents.RECORD_EO_DRACONA){}.setCreativeTab(ModCreativeTabs.CREATIVE_TAB).setMaxStackSize(1));
-
-
-
-
 	//////////////////////////////////////////////////////
 	//
 	// Item registration helpers

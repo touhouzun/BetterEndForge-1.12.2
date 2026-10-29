@@ -1,6 +1,5 @@
 package mod.beethoven92.betterendforge.common.world.biome;
 
-import mod.beethoven92.betterendforge.client.audio.BetterEndMusicNames;
 import mod.beethoven92.betterendforge.common.init.ModBlocks;
 import mod.beethoven92.betterendforge.common.init.ModConfiguredFeatures;
 import mod.beethoven92.betterendforge.common.init.ModSoundEvents;
@@ -18,7 +17,6 @@ public class GlowingGrasslandsBiome extends BetterEndBiome
 				.setGrassColor(73, 210, 209)
 				.setFogColor(99, 228, 247)				
 				.setFogDensity(1.3F)
-				.setMusic(BetterEndMusicNames.MUSIC_OPENSPACE)
 				.setAmbientSound(ModSoundEvents.AMBIENT_GLOWING_GRASSLANDS)
 				//.setParticles(ModParticleTypes.FIREFLY, 0.001F)
 				.setSurface(ModBlocks.END_MOSS)

@@ -1,6 +1,5 @@
 package mod.beethoven92.betterendforge.common.world.biome;
 
-import mod.beethoven92.betterendforge.client.audio.BetterEndMusicNames;
 import mod.beethoven92.betterendforge.common.entity.CubozoaEntity;
 import mod.beethoven92.betterendforge.common.entity.EndFishEntity;
 import mod.beethoven92.betterendforge.common.init.ModConfiguredFeatures;
@@ -23,7 +22,6 @@ public class SulphurSpringsBiome extends BetterEndBiome
 				setSurface(ModConfiguredSurfaceBuilders.SULPHURIC_SURFACE).
 				//setSurface(ModConfiguredSurfaceBuilders.get(ModConfiguredSurfaceBuilders.SULPHURIC_SURFACE)).
 				setAmbientSound(ModSoundEvents.AMBIENT_SULPHUR_SPRINGS).
-				setMusic(BetterEndMusicNames.MUSIC_OPENSPACE).
 				//setParticles(ModParticleTypes.SULPHUR_PARTICLE, 0.001F).
 				addFeature(Decoration.RAW_GENERATION, ModConfiguredFeatures.GEYSER).
 				addFeature(Decoration.LAKES, ModConfiguredFeatures.SULPHURIC_LAKE).

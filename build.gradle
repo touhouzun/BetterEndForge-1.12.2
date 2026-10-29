@@ -153,3 +153,82 @@ jar {
 
 build.dependsOn(shadowJar)
 jar.finalizedBy('reobfJar')
+
+tasks.register('terrainRegressionTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'mod.beethoven92.betterendforge.common.world.generator.TerrainRegressionTest'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+check.dependsOn terrainRegressionTest
+
+tasks.register('waterPlantRegressionTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'mod.beethoven92.betterendforge.common.world.feature.WaterPlantRegressionTest'
+    def regressionDirectory = layout.buildDirectory.dir('regression/waterPlants')
+    workingDir regressionDirectory
+    doFirst { regressionDirectory.get().asFile.mkdirs() }
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+check.dependsOn waterPlantRegressionTest
+
+tasks.register('lakeOreRegressionTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'mod.beethoven92.betterendforge.common.world.generator.LakeOreRegressionTest'
+    def regressionDirectory = layout.buildDirectory.dir('regression/lakeOres')
+    workingDir regressionDirectory
+    doFirst { regressionDirectory.get().asFile.mkdirs() }
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+check.dependsOn lakeOreRegressionTest
+
+tasks.register('biomeTransitionRegressionTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'mod.beethoven92.betterendforge.common.world.generator.BiomeTransitionRegressionTest'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+check.dependsOn biomeTransitionRegressionTest
+
+tasks.register('islandShoreRegressionTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'mod.beethoven92.betterendforge.common.world.generator.IslandShoreRegressionTest'
+    def regressionDirectory = layout.buildDirectory.dir('regression/islandShore')
+    workingDir regressionDirectory
+    doFirst { regressionDirectory.get().asFile.mkdirs() }
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+check.dependsOn islandShoreRegressionTest
+
+tasks.register('mountainIslandRegressionTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'mod.beethoven92.betterendforge.common.world.generator.MountainIslandRegressionTest'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+check.dependsOn mountainIslandRegressionTest
+
+tasks.register('crystalFoundationRegressionTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'mod.beethoven92.betterendforge.common.world.feature.CrystalFoundationRegressionTest'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+check.dependsOn crystalFoundationRegressionTest

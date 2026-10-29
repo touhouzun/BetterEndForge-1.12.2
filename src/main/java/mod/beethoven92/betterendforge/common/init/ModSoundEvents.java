@@ -1,13 +1,11 @@
 package mod.beethoven92.betterendforge.common.init;
 
 import mod.beethoven92.betterendforge.BetterEnd;
-import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.ArrayList;
 
@@ -16,19 +14,6 @@ public class ModSoundEvents
 {
 	public static ArrayList<SoundEvent> registry = new ArrayList<>();
 
-	// MUSIC TRACKS
-	public static final SoundEvent MUSIC_FOREST = 
-			registerSoundEvent("betterendforge.music.forest");
-	public static final SoundEvent MUSIC_WATER = 
-			registerSoundEvent("betterendforge.music.water");
-	public static final SoundEvent MUSIC_DARK = 
-			registerSoundEvent("betterendforge.music.dark");
-	public static final SoundEvent MUSIC_OPENSPACE = 
-			registerSoundEvent("betterendforge.music.openspace");
-	public static final SoundEvent MUSIC_CAVES =
-			registerSoundEvent("betterendforge.music.caves");
-
-	
 	// AMBIENT SOUNDS
 	public static final SoundEvent AMBIENT_AMBER_LAND =
 			registerSoundEvent("betterendforge.ambient.amber_land");
@@ -65,16 +50,6 @@ public class ModSoundEvents
 	public static final SoundEvent ENTITY_SHADOW_WALKER_DEATH = 
 			registerSoundEvent("betterendforge.entity.shadow_walker_death");
 	
-	// RECORDS
-	public static final SoundEvent RECORD_STRANGE_AND_ALIEN = 
-			registerSoundEvent("betterendforge.record.strange_and_alien");
-	public static final SoundEvent RECORD_GRASPING_AT_STARS = 
-			registerSoundEvent("betterendforge.record.grasping_at_stars");
-	public static final SoundEvent RECORD_ENDSEEKER = 
-			registerSoundEvent("betterendforge.record.endseeker");
-	public static final SoundEvent RECORD_EO_DRACONA = 
-			registerSoundEvent("betterendforge.record.eo_dracona");
-
 	private static SoundEvent registerSoundEvent(String name)
 	{
 		SoundEvent event = new SoundEvent(new ResourceLocation(BetterEnd.MOD_ID, name)).setRegistryName(new ResourceLocation(BetterEnd.MOD_ID, name));

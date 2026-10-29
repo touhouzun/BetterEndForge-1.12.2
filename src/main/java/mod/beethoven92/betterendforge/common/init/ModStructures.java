@@ -20,9 +20,10 @@ public class ModStructures
 
 	public static void registerStructures(INetherAPIRegistry registry)
     {
-		registry.registerStructure("mountain_structure", (provider)->new MountainStructure(provider, 3, 2, 1234567890));
-//		registry.registerStructure("megalake_structure", (provider)->new MegaLakeStructure(provider, 4, 1, 1237890));
-//		registry.registerStructure("megalake_small_structure", (provider)->new MegaLakeStructure(provider, 4, 1, 1223462190));
+		// Mountains and lakes are now continuous terrain built in ChunkPrimer.
+		// Keep the IO registrations below for existing saved structures only.
+		// The basin is large enough to span several chunks.  Keep starts apart so
+		// neighbouring lakes never overwrite each other's shore or water level.
 //		registry.registerStructure("giant_mossy_glowshroom_structure", (provider)->new GiantMossyGlowshroomStructure(provider, 16, 8, 1234560));
 //		registry.registerStructure("painted_mountain_structure", (provider)->new PaintedMountainStructure(provider, 3, 2, 12890));
 //		//NetherAPIRegistry.THE_END.registerStructure("eternal_portal_structure", (provider)->new EternalPortalStructure(16, 6, 1289052454));
